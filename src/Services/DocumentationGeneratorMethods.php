@@ -15,8 +15,9 @@ trait DocumentationGeneratorMethods
     protected function generateComprehensiveGuide(array $route, array $memory): string
     {
         $routeLinksEnabled = $this->config['route_links']['enabled'] ?? true;
-        $baseUrl = $this->config['route_links']['base_url'] ?? '';
-        $currentUrl = $baseUrl . $route['path'];
+
+        // Build current URL - just use path without domain
+        $currentUrl = $route['path'];
 
         // Find related routes
         $relatedRoutes = $this->findRelatedRoutes($route['path']);
@@ -25,8 +26,8 @@ trait DocumentationGeneratorMethods
         if ($routeLinksEnabled && !empty($relatedRoutes)) {
             $relatedLinksText = "\n\nRelated Pages:\n";
             foreach ($relatedRoutes as $relatedRoute) {
-                $relatedUrl = $baseUrl . $relatedRoute['path'];
-                $relatedLinksText .= "- [{$relatedRoute['path']}]({$relatedUrl})\n";
+                // Just use the path without domain
+                $relatedLinksText .= "- {$relatedRoute['path']}\n";
             }
         }
 
@@ -54,10 +55,12 @@ This is CRITICAL. Use your navigation knowledge to provide EXACT steps:
 [Provide step-by-step navigation for each relevant user role]
 Example format:
 **For [User Role]:**
-1. Log in to [Portal Name]
+1. Log in to the portal
 2. In sidebar, click "[Exact Menu Section]"
 3. Select "[Exact Menu Item]"
 4. Click "[Specific Link]"
+
+IMPORTANT: Do NOT include full URLs in navigation steps. Only describe the UI elements to click.
 
 ## 3. Page Layout & What You'll See
 - Describe the main screen layout
