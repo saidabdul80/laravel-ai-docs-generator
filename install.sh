@@ -53,7 +53,7 @@ fi
 
 # Run composer update
 echo "Running composer update..."
-composer update schooltry/ai-documentation-generator
+composer update laravel/ai-documentation-generator
 
 echo ""
 echo "📝 Publishing configuration..."

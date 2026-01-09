@@ -103,7 +103,7 @@ Each generated document includes:
 }
 
 # 2. Install
-composer update schooltry/ai-documentation-generator
+composer update laravel/ai-documentation-generator
 
 # 3. Publish config
 php artisan vendor:publish --tag=ai-docs-config

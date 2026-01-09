@@ -12,12 +12,18 @@ A comprehensive Laravel package for generating end-user documentation from Vue.j
 - 📊 **Vector Database**: Build searchable vector databases from generated docs
 - ⚙️ **Highly Configurable**: Extensive configuration options for customization
 
+## Requirements
+
+- PHP 8.1, 8.2, or 8.3
+- Laravel 10.x, 11.x, or 12.x
+- Composer
+
 ## Installation
 
 ### 1. Install via Composer
 
 ```bash
-composer require schooltry/ai-documentation-generator
+composer require laravel/ai-documentation-generator
 ```
 
 ### 2. Publish Configuration

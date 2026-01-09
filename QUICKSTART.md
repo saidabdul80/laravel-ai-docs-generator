@@ -40,7 +40,7 @@ ollama pull qwen2.5:7b-instruct
 }
 
 # Install
-composer update schooltry/ai-documentation-generator
+composer update laravel/ai-documentation-generator
 ```
 
 ## Step 3: Publish Configuration

@@ -6,7 +6,7 @@
 
 ```bash
 # Install the package
-composer require schooltry/ai-documentation-generator
+composer require laravel/ai-documentation-generator
 
 # Publish configuration
 php artisan vendor:publish --tag=ai-docs-config
