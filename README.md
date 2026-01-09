@@ -4,12 +4,13 @@ A comprehensive Laravel package for generating end-user documentation from Vue.j
 
 ## Features
 
-- 🤖 **Multi-Provider Support**: Works with Ollama, OpenAI, Claude, and Gemini
+- 🤖 **Multi-Provider Support**: Works with Ollama, OpenAI, Claude, Gemini, and SchoolTry AI Service
 - 📝 **Automatic Documentation**: Generates comprehensive user guides from Vue components
 - 🧭 **Navigation-Aware**: Analyzes navigation structure for accurate user instructions
 - 🔗 **Route Links**: Automatically includes clickable route links in documentation
 - 🎯 **Context-Rich**: Uses layout files and navigation components for better context
 - 📊 **Vector Database**: Build searchable vector databases from generated docs
+- ☁️ **Centralized AI**: Use SchoolTry AI Service for consistent documentation generation
 - ⚙️ **Highly Configurable**: Extensive configuration options for customization
 
 ## Requirements
@@ -77,6 +78,24 @@ AI_DOCS_GEMINI_LIGHT_MODEL=gemini-1.5-flash
 AI_DOCS_GEMINI_STANDARD_MODEL=gemini-1.5-pro
 AI_DOCS_GEMINI_HEAVY_MODEL=gemini-2.0-flash
 ```
+
+#### For SchoolTry AI Service (Recommended)
+
+```env
+AI_DOCS_PROVIDER=schooltry
+AI_DOCS_SCHOOLTRY_URL=http://localhost:8000/api/docs
+AI_DOCS_SCHOOLTRY_KEY=your-api-key-here  # Optional
+AI_DOCS_SCHOOLTRY_LIGHT_MODEL=documentation
+AI_DOCS_SCHOOLTRY_STANDARD_MODEL=documentation
+AI_DOCS_SCHOOLTRY_HEAVY_MODEL=documentation
+```
+
+**Benefits of SchoolTry AI Service:**
+- Centralized AI service for consistent documentation
+- Dedicated DocumentationGeneratorAgent optimized for user guides
+- No external API costs (uses your own infrastructure)
+- Customizable prompts and behavior
+- Integrated with your SchoolTry ecosystem
 
 ## Usage
 

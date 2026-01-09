@@ -5,6 +5,20 @@ All notable changes to the AI Documentation Generator package will be documented
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-01-09
+
+### Added
+- SchoolTry AI Service provider support
+- New `/api/docs/chat` endpoint in AI service for documentation generation
+- DocumentationGeneratorAgent with specialized prompts for user documentation
+- SchoolTryAIProvider class for seamless integration
+- Configuration for SchoolTry AI Service (AI_DOCS_PROVIDER=schooltry)
+- Centralized documentation generation through SchoolTry ecosystem
+
+### Changed
+- Updated AIProviderFactory to include SchoolTry provider
+- Enhanced documentation with SchoolTry AI Service setup instructions
+
 ## [1.1.0] - 2026-01-09
 
 ### Added
@@ -16,11 +30,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Status checking before upload
 - Automatic file validation and error handling
 - Upload progress and result reporting
+- Laravel 12.x support
+- PHP 8.2 and 8.3 support
 
 ### Changed
 - Updated configuration to include AI service settings
 - Enhanced BuildDocVectorDbCommand with upload capability
 - Updated documentation with upload instructions
+- Extended Laravel compatibility to include version 12.x
+- Extended PHP compatibility to include versions 8.2 and 8.3
 
 ## [1.0.0] - 2026-01-09
 

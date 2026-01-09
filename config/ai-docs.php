@@ -7,7 +7,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | Configure which AI provider to use for documentation generation.
-    | Supported: 'ollama', 'openai', 'claude', 'gemini'
+    | Supported: 'ollama', 'openai', 'claude', 'gemini', 'schooltry'
     |
     */
     'provider' => env('AI_DOCS_PROVIDER', 'ollama'),
@@ -70,6 +70,19 @@ return [
             'temperature' => 0.7,
             'max_tokens' => 2500,
             'timeout' => 60,
+        ],
+
+        'schooltry' => [
+            'base_url' => env('AI_DOCS_SCHOOLTRY_URL', 'http://localhost:8000/api/docs'),
+            'api_key' => env('AI_DOCS_SCHOOLTRY_KEY'), // Optional, for future authentication
+            'models' => [
+                'lightweight' => env('AI_DOCS_SCHOOLTRY_LIGHT_MODEL', 'documentation'),
+                'standard' => env('AI_DOCS_SCHOOLTRY_STANDARD_MODEL', 'documentation'),
+                'heavy' => env('AI_DOCS_SCHOOLTRY_HEAVY_MODEL', 'documentation'),
+            ],
+            'temperature' => 0.7,
+            'max_tokens' => 4000,
+            'timeout' => 120,
         ],
     ],
 

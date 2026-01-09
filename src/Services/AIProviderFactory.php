@@ -7,6 +7,7 @@ use SchoolTry\AIDocumentationGenerator\Services\Providers\OllamaProvider;
 use SchoolTry\AIDocumentationGenerator\Services\Providers\OpenAIProvider;
 use SchoolTry\AIDocumentationGenerator\Services\Providers\ClaudeProvider;
 use SchoolTry\AIDocumentationGenerator\Services\Providers\GeminiProvider;
+use SchoolTry\AIDocumentationGenerator\Services\Providers\SchoolTryAIProvider;
 use InvalidArgumentException;
 
 class AIProviderFactory
@@ -26,6 +27,7 @@ class AIProviderFactory
             'openai' => new OpenAIProvider($config),
             'claude' => new ClaudeProvider($config),
             'gemini' => new GeminiProvider($config),
+            'schooltry' => new SchoolTryAIProvider($config),
             default => throw new InvalidArgumentException("Unsupported AI provider: {$provider}"),
         };
     }
@@ -37,7 +39,7 @@ class AIProviderFactory
      */
     public static function getAvailableProviders(): array
     {
-        return ['ollama', 'openai', 'claude', 'gemini'];
+        return ['ollama', 'openai', 'claude', 'gemini', 'schooltry'];
     }
 }
 
