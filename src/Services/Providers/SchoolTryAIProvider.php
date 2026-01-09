@@ -17,7 +17,7 @@ class SchoolTryAIProvider implements AIProviderInterface
 
     public function __construct(array $config)
     {
-        $this->baseUrl = rtrim($config['base_url'], '/');
+        $this->baseUrl = rtrim($config['base_url'] ?? 'http://localhost:8000/api/docs', '/');
         $this->apiKey = $config['api_key'] ?? null;
         $this->model = $config['models']['standard'] ?? 'documentation';
         $this->temperature = $config['temperature'] ?? 0.7;
