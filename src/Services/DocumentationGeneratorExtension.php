@@ -123,23 +123,42 @@ USR
         ];
 
         $flat = $this->flattenPageContext($pageContext);
-        $chunks = $this->chunkContext($flat);
 
-        // Process content chunks
-        foreach ($chunks as $index => $chunk) {
+        // Fast mode: skip chunk processing, go straight to guide generation
+        $fastMode = $this->config['generation']['fast_mode'] ?? false;
+
+        if ($fastMode) {
+            // Add all content in one go
             $memory[] = [
                 'role' => 'user',
-                'content' => $this->buildChunkPrompt($index, $chunk),
+                'content' => "Page Content:\n\n" . substr($flat, 0, 15000) . "\n\nAnalyze this page and prepare to generate documentation.",
             ];
 
             $response = $this->aiProvider->chat($memory, 'lightweight');
-
             $memory[] = [
                 'role' => 'assistant',
                 'content' => $response ?: 'Analyzed page content.',
             ];
+        } else {
+            // Normal mode: process in chunks
+            $chunks = $this->chunkContext($flat);
 
-            $this->trimMemory($memory, $this->config['generation']['memory_limit'] ?? 40);
+            // Process content chunks
+            foreach ($chunks as $index => $chunk) {
+                $memory[] = [
+                    'role' => 'user',
+                    'content' => $this->buildChunkPrompt($index, $chunk),
+                ];
+
+                $response = $this->aiProvider->chat($memory, 'lightweight');
+
+                $memory[] = [
+                    'role' => 'assistant',
+                    'content' => $response ?: 'Analyzed page content.',
+                ];
+
+                $this->trimMemory($memory, $this->config['generation']['memory_limit'] ?? 40);
+            }
         }
 
         // Generate comprehensive guide

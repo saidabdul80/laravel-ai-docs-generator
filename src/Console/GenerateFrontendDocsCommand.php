@@ -17,6 +17,7 @@ class GenerateFrontendDocsCommand extends Command
         {--skip-navigation : Skip navigation analysis (faster but less context)}
         {--test-single= : Test a single route path}
         {--limit= : Limit number of routes to process (for testing)}
+        {--fast : Fast mode - single AI call per route (less detailed but much faster)}
         {--concurrency= : Number of concurrent chunk requests}
         {--force : Regenerate docs even if documentation already exists}';
 
@@ -34,6 +35,13 @@ class GenerateFrontendDocsCommand extends Command
     {
         $this->info('🚀 Starting AI Documentation Generation');
         $this->newLine();
+
+        // Apply fast mode if requested
+        if ($this->option('fast')) {
+            config(['ai-docs.generation.fast_mode' => true]);
+            $this->info('⚡ Fast mode enabled - using single AI call per route');
+            $this->newLine();
+        }
 
         // Get configuration
         $routesFile = $this->option('routes') ?? config('ai-docs.layout_files.router');
