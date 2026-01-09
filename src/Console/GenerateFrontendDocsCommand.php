@@ -14,7 +14,9 @@ class GenerateFrontendDocsCommand extends Command
         {--routes= : Path to routes file}
         {--max-depth= : Maximum depth for Vue component crawling}
         {--refresh-navigation : Refresh navigation analysis}
+        {--skip-navigation : Skip navigation analysis (faster but less context)}
         {--test-single= : Test a single route path}
+        {--limit= : Limit number of routes to process (for testing)}
         {--concurrency= : Number of concurrent chunk requests}
         {--force : Regenerate docs even if documentation already exists}';
 
@@ -56,7 +58,9 @@ class GenerateFrontendDocsCommand extends Command
         }
 
         // Analyze navigation
-        if ($this->option('refresh-navigation') || !$this->hasNavigationCache()) {
+        if ($this->option('skip-navigation')) {
+            $this->info("⏭️  Skipping navigation analysis");
+        } elseif ($this->option('refresh-navigation') || !$this->hasNavigationCache()) {
             $this->info("🧭 Analyzing navigation structure...");
             try {
                 $this->generator->analyzeNavigation();
@@ -77,19 +81,33 @@ class GenerateFrontendDocsCommand extends Command
             $this->info("Testing single route: {$testSingle}");
         }
 
+        // Limit routes if specified
+        $limit = $this->option('limit');
+        if ($limit && !$testSingle) {
+            $routes = array_slice($routes, 0, (int)$limit);
+            $this->info("⚡ Processing first {$limit} routes only");
+        }
+
         // Process routes
         $processed = 0;
+        $skipped = 0;
+        $failed = 0;
         $progressBar = $this->output->createProgressBar(count($routes));
+        $progressBar->setFormat(' %current%/%max% [%bar%] %percent:3s%% - %message%');
+        $progressBar->setMessage('Starting...');
         $progressBar->start();
 
         foreach ($routes as $route) {
+            $progressBar->setMessage("Processing: {$route['path']}");
             $progressBar->advance();
 
             if (!$this->option('force') && $this->shouldSkipExisting($route)) {
+                $skipped++;
                 continue;
             }
 
             if (!File::exists($route['component'])) {
+                $skipped++;
                 continue;
             }
 
@@ -97,6 +115,7 @@ class GenerateFrontendDocsCommand extends Command
                 $pageContext = $this->generator->crawlVueFile($route['component']);
 
                 if (empty($pageContext['content'])) {
+                    $skipped++;
                     continue;
                 }
 
@@ -104,18 +123,35 @@ class GenerateFrontendDocsCommand extends Command
                 $this->storeDocumentation($route, $docs);
 
                 $processed++;
+                $progressBar->setMessage("✓ {$route['path']}");
 
             } catch (Exception $e) {
+                $failed++;
+                $progressBar->setMessage("✗ {$route['path']}: {$e->getMessage()}");
+
                 Log::error("Frontend docs generation failed for {$route['path']}", [
                     'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
                 ]);
+
+                // Show error in console if verbose
+                if ($this->option('verbose')) {
+                    $this->newLine();
+                    $this->error("Failed: {$route['path']} - {$e->getMessage()}");
+                }
             }
         }
 
+        $progressBar->setMessage('Complete!');
         $progressBar->finish();
         $this->newLine(2);
 
-        $this->info("🎉 Documentation generation completed. Processed: {$processed}/" . count($routes));
+        $this->info("🎉 Documentation generation completed!");
+        $this->info("   ✅ Processed: {$processed}");
+        $this->info("   ⏭️  Skipped: {$skipped}");
+        if ($failed > 0) {
+            $this->warn("   ❌ Failed: {$failed}");
+        }
         return Command::SUCCESS;
     }
 
