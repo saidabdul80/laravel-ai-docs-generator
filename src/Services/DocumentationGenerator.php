@@ -55,6 +55,7 @@ class DocumentationGenerator
     {
         $fixed = [];
         $pathGroups = [];
+        $seen = [];
 
         // Group routes by path
         foreach ($routes as $route) {
@@ -71,12 +72,33 @@ class DocumentationGenerator
                 foreach ($group as $route) {
                     $component = $route['component'];
 
+                    // Check if this exact route (path + component) was already added
+                    $routeKey = $route['path'] . '|' . $route['component'];
+                    if (isset($seen[$routeKey])) {
+                        // Skip exact duplicates
+                        continue;
+                    }
+                    $seen[$routeKey] = true;
+
                     // Infer prefix from component path
                     $prefix = $this->inferPrefixFromComponent($component);
 
                     if ($prefix && !str_starts_with($path, $prefix)) {
                         // Add prefix to path
                         $route['path'] = rtrim($prefix, '/') . '/' . ltrim($path, '/');
+                    }
+
+                    // Check for subdirectory variations (e.g., ExamOffice)
+                    if (preg_match('/\/(ExamOffice|ExamOffice)\//', $component)) {
+                        // Add /exam-office suffix if not already present
+                        if (!str_contains($route['path'], '/exam-office')) {
+                            $parts = explode('/', $route['path']);
+                            // Insert exam-office after the role prefix
+                            if (count($parts) >= 2) {
+                                array_splice($parts, 2, 0, 'exam-office');
+                                $route['path'] = implode('/', $parts);
+                            }
+                        }
                     }
 
                     $fixed[] = $route;
