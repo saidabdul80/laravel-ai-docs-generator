@@ -41,8 +41,86 @@ class DocumentationGenerator
             $this->parseRouteDefinitions($routesContent, $routes);
         }
 
+        // Post-process: Fix paths based on component locations to handle duplicates
+        $routes = $this->deduplicateRoutesByComponent($routes);
+
         $this->allRoutes = $routes;
         return $routes;
+    }
+
+    /**
+     * Deduplicate routes by inferring correct paths from component locations
+     */
+    protected function deduplicateRoutesByComponent(array $routes): array
+    {
+        $fixed = [];
+        $pathGroups = [];
+
+        // Group routes by path
+        foreach ($routes as $route) {
+            $pathGroups[$route['path']][] = $route;
+        }
+
+        // Process each group
+        foreach ($pathGroups as $path => $group) {
+            if (count($group) === 1) {
+                // No duplicates, keep as is
+                $fixed[] = $group[0];
+            } else {
+                // Multiple routes with same path - infer correct path from component
+                foreach ($group as $route) {
+                    $component = $route['component'];
+
+                    // Infer prefix from component path
+                    $prefix = $this->inferPrefixFromComponent($component);
+
+                    if ($prefix && !str_starts_with($path, $prefix)) {
+                        // Add prefix to path
+                        $route['path'] = rtrim($prefix, '/') . '/' . ltrim($path, '/');
+                    }
+
+                    $fixed[] = $route;
+                }
+            }
+        }
+
+        return $fixed;
+    }
+
+    /**
+     * Infer route prefix from component path
+     */
+    protected function inferPrefixFromComponent(string $componentPath): ?string
+    {
+        // Extract the role/section from component path
+        // e.g., /path/to/Views/Admin/... -> /admin
+        // e.g., /path/to/Views/Student/... -> /student
+
+        if (preg_match('/\/Views\/([^\/]+)\//', $componentPath, $matches)) {
+            $section = $matches[1];
+
+            // Map component sections to route prefixes
+            $prefixMap = [
+                'Admin' => '/admin',
+                'Student' => '/student',
+                'Lecturer' => '/lecturer',
+                'Department' => '/department',
+                'Faculty' => '/faculty',
+                'Institutes' => '/institute',
+                'Director' => '/director',
+                'SupportStaff' => '/support-staff',
+                'AdministrativeOfficer' => '/administrative-officer',
+                'FinanceOfficer' => '/finance-officer',
+                'HostelManager' => '/hostel-manager',
+                'AcademicLevelAdviser' => '/academic-level-adviser',
+                'Cordinator' => '/cordinator',
+                'ProgrammeCordinator' => '/programme-cordinator',
+            ];
+
+            return $prefixMap[$section] ?? null;
+        }
+
+        return null;
     }
 
     /**
