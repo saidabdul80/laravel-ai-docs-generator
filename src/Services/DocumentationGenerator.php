@@ -72,6 +72,11 @@ class DocumentationGenerator
                     $fullPath = $path;
                 }
 
+                // Ensure path always starts with /
+                if (!str_starts_with($fullPath, '/')) {
+                    $fullPath = '/' . $fullPath;
+                }
+
                 // Skip redirects
                 if (str_contains($routeText, 'redirect:') && !str_contains($routeText, 'component:')) {
                     continue;
