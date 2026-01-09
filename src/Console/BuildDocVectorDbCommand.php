@@ -47,7 +47,7 @@ class BuildDocVectorDbCommand extends Command
         $this->newLine();
 
         if ($force) {
-            $storePath = $dir . DIRECTORY_SEPARATOR . 'neuron.store';
+            $storePath = base_path(config('ai-docs.vector_db.store_path'));
             if (File::exists($storePath)) {
                 File::delete($storePath);
                 $this->info("🗑️  Deleted existing vector store");
@@ -174,7 +174,7 @@ class BuildDocVectorDbCommand extends Command
     {
         $this->info('📤 Uploading to AI service...');
 
-        $neuronStorePath = $dir . DIRECTORY_SEPARATOR . 'neuron.store';
+        $neuronStorePath = base_path(config('ai-docs.vector_db.store_path'));
         $indexPath = $dir . DIRECTORY_SEPARATOR . 'index.json';
 
         // Check if files exist

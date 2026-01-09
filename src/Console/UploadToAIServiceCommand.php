@@ -155,14 +155,14 @@ class UploadToAIServiceCommand extends Command
         // Check directory option
         elseif ($this->option('dir')) {
             $dir = $this->option('dir');
-            $neuronStorePath = $dir . DIRECTORY_SEPARATOR . 'neuron.store';
+            $neuronStorePath = base_path(config('ai-docs.vector_db.store_path'));
             $indexPath = $dir . DIRECTORY_SEPARATOR . 'index.json';
         }
         // Use default from config
         else {
             $outputDir = config('ai-docs.generation.output_dir');
-            $dir = storage_path("app/{$outputDir}");
-            $neuronStorePath = $dir . DIRECTORY_SEPARATOR . 'neuron.store';
+            $dir = base_path($outputDir);
+            $neuronStorePath = base_path(config('ai-docs.vector_db.store_path'));
             $indexPath = $dir . DIRECTORY_SEPARATOR . 'index.json';
         }
 
