@@ -195,6 +195,8 @@ return [
     */
     'customer_support' => [
         'enabled' => env('AI_SERVICE_SUPPORT_ENABLED', true),
+        'api_prefix' => env('AI_SERVICE_SUPPORT_API_PREFIX', 'api'),
+        'api_middleware' => ['api'],
         'prefix' => env('AI_SERVICE_SUPPORT_PREFIX', 'customer-support'),
         'middleware' => [],
         'guest_prefix' => env('AI_DOCS_SUPPORT_GUEST_PREFIX', 'customer-support/guest'),

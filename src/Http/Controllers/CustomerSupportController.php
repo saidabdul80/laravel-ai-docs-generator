@@ -18,6 +18,7 @@ class CustomerSupportController extends Controller
             'message' => 'required|string|max:2000',
             'session_id' => 'nullable|string',
             'stream' => 'nullable|boolean',
+            'instructions' => 'nullable|string|max:2000',
         ]);
 
         $message = trim($request->input('message'));
@@ -28,7 +29,14 @@ class CustomerSupportController extends Controller
         $threadKey = auth()->check() ? auth()->id() . '_thread_id' : 'guest_thread_id';
         session([$threadKey => $sessionId]);
 
-        return $this->handleAIServiceQuery($message, $sessionId, $agent, $stream, $request->input('user_context', []));
+        return $this->handleAIServiceQuery(
+            $message,
+            $sessionId,
+            $agent,
+            $stream,
+            $request->input('user_context', []),
+            $request->input('instructions')
+        );
     }
 
     protected function handleAIServiceQuery(
@@ -36,7 +44,8 @@ class CustomerSupportController extends Controller
         string $threadId,
         string $agent,
         bool $stream,
-        array $userContext
+        array $userContext,
+        ?string $instructions
     ) {
         $aiServiceUrl = $this->supportConfig('ai_service.url', config('ai-docs.ai_service.url', 'http://localhost:8000'));
         $aiServiceKey = $this->supportConfig('ai_service.api_key', config('ai-docs.ai_service.api_key'));
@@ -56,13 +65,6 @@ class CustomerSupportController extends Controller
                 'user_role' => $user->role ?? 'user',
             ]);
         }
-
-        Log::info('Sending query to AI service', [
-            'thread_id' => $threadId,
-            'agent' => $agent,
-            'message_length' => strlen($message),
-            'stream' => $stream,
-        ]);
 
         if ($stream) {
             return $this->streamAIServiceResponse(
@@ -86,6 +88,7 @@ class CustomerSupportController extends Controller
                     'agent' => $agent,
                     'stream' => false,
                     'user_context' => $userContext,
+                    'instructions' => $instructions,
                 ]);
 
             if ($response->successful()) {
@@ -236,6 +239,7 @@ class CustomerSupportController extends Controller
             'agent' => 'nullable|string',
             'stream' => 'nullable|boolean',
             'user_context' => 'nullable|array',
+            'instructions' => 'nullable|string|max:2000',
         ]);
 
         $message = trim($request->input('message'));
@@ -243,6 +247,7 @@ class CustomerSupportController extends Controller
         $agent = $request->input('agent', $this->supportConfig('ai_service.default_agent', 'documentation'));
         $stream = $request->boolean('stream', false);
         $userContext = $request->input('user_context', []);
+        $instructions = $request->input('instructions');
 
         $aiServiceUrl = $this->supportConfig('ai_service.url', config('ai-docs.ai_service.url', 'http://localhost:8000'));
         $aiServiceKey = $this->supportConfig('ai_service.api_key', config('ai-docs.ai_service.api_key'));
@@ -263,13 +268,7 @@ class CustomerSupportController extends Controller
             ]);
         }
 
-        Log::info('Sending query to AI service', [
-            'thread_id' => $threadId,
-            'agent' => $agent,
-            'message_length' => strlen($message),
-            'stream' => $stream,
-        ]);
-
+    
         if ($stream) {
             return $this->streamAIServiceResponse(
                 $aiServiceUrl,
@@ -277,7 +276,8 @@ class CustomerSupportController extends Controller
                 $message,
                 $threadId,
                 $agent,
-                $userContext
+                $userContext,
+                $instructions
             );
         }
 
@@ -292,6 +292,7 @@ class CustomerSupportController extends Controller
                     'agent' => $agent,
                     'stream' => false,
                     'user_context' => $userContext,
+                    'instructions' => $instructions,
                 ]);
 
             if ($response->successful()) {
@@ -339,7 +340,13 @@ class CustomerSupportController extends Controller
         string $agent,
         array $userContext
     ) {
-        return response()->stream(function () use ($aiServiceUrl, $aiServiceKey, $message, $threadId, $agent, $userContext) {
+        Log::info('Sending query to AI service4', [
+            'thread_id' => $threadId,
+            'agent' => $agent,
+            'message_length' => strlen($message),
+        ]);
+        $instructions = request()->input('instructions');
+        return response()->stream(function () use ($aiServiceUrl, $aiServiceKey, $message, $threadId, $agent, $userContext, $instructions) {
             try {
                 echo "data: " . json_encode([
                     'type' => 'status',
@@ -351,6 +358,7 @@ class CustomerSupportController extends Controller
                 $timeout = (int) $this->supportConfig('ai_service.stream_timeout', 120);
 
                 $response = Http::withToken($aiServiceKey)
+                    ->withHeaders(['Accept' => 'text/event-stream'])
                     ->timeout($timeout)
                     ->withOptions(['stream' => true])
                     ->post("{$aiServiceUrl}/api/chat", [
@@ -359,11 +367,19 @@ class CustomerSupportController extends Controller
                         'agent' => $agent,
                         'stream' => true,
                         'user_context' => $userContext,
+                        'instructions' => $instructions,
                     ]);
 
                 $fullResponse = '';
+                $body = $response->toPsrResponse()->getBody();
 
-                foreach ($response->getBody() as $chunk) {
+                while (! $body->eof()) {
+                    $chunk = $body->read(1024);
+                    if ($chunk === '') {
+                        usleep(10000);
+                        continue;
+                    }
+
                     echo $chunk;
                     flush();
 
