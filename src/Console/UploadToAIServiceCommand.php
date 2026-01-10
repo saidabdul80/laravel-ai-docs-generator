@@ -141,8 +141,8 @@ class UploadToAIServiceCommand extends Command
      */
     protected function resolveFilePaths(): array
     {
-        $neuronStorePath = null;
-        $indexPath = null;
+        $neuronStorePath = config('ai-docs.vector_db.store_path').'/neuron.store';
+        $indexPath =  config('ai-docs.vector_db.store_path').'/index.json';
 
         // Check explicit file paths
         if ($this->option('neuron-store') && $this->option('index')) {
