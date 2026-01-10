@@ -184,5 +184,31 @@ return [
         'timeout' => env('AI_DOCS_UPLOAD_TIMEOUT', 60),
         'verify_ssl' => env('AI_DOCS_VERIFY_SSL', true),
     ],
-];
 
+    /*
+    |--------------------------------------------------------------------------
+    | Customer Support API Settings
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for exposing customer support routes from this package.
+    |
+    */
+    'customer_support' => [
+        'enabled' => env('AI_SERVICE_SUPPORT_ENABLED', true),
+        'prefix' => env('AI_SERVICE_SUPPORT_PREFIX', 'customer-support'),
+        'middleware' => [],
+        'guest_prefix' => env('AI_DOCS_SUPPORT_GUEST_PREFIX', 'customer-support/guest'),
+        'guest_middleware' => [],
+        'guest_without_middleware' => ['auth:sanctum'],
+        'agent_class' => env('AI_DOCS_SUPPORT_AGENT_CLASS'),
+        'history_model' => env('AI_DOCS_SUPPORT_HISTORY_MODEL'),
+        'history_enabled' => env('AI_DOCS_SUPPORT_HISTORY_ENABLED', true),
+        'ai_service' => [
+            'url' => env('AI_SERVICE_URL', 'http://localhost:8000'),
+            'api_key' => env('AI_SERVICE_API_KEY', ''),
+            'timeout' => env('AI_SERVICE_TIMEOUT', 60),
+            'stream_timeout' => env('AI_SERVICE_STREAM_TIMEOUT', 120),
+            'default_agent' => env('AI_SERVICE_AGENT_NAME', 'customer_support'),
+        ],
+    ],
+];

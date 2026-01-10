@@ -39,6 +39,8 @@ class AIDocumentationServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->loadRoutesFrom(__DIR__ . '/../../routes/api.php');
+
         // Publish config
         $this->publishes([
             __DIR__ . '/../../config/ai-docs.php' => config_path('ai-docs.php'),
@@ -54,4 +56,3 @@ class AIDocumentationServiceProvider extends ServiceProvider
         }
     }
 }
-
