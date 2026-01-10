@@ -28,6 +28,7 @@ return [
                 'standard' => env('AI_DOCS_OLLAMA_STANDARD_MODEL', 'qwen2.5:7b-instruct'),
                 'heavy' => env('AI_DOCS_OLLAMA_HEAVY_MODEL', 'qwen2.5:14b'),
             ],
+            'model_embedding'=> env('EMBEDDING_MODEL', 'nomic-embed-text'),
             'temperature' => 0.7,
             'max_tokens' => 2500,
             'timeout' => 120,
@@ -57,6 +58,8 @@ return [
             'temperature' => 0.7,
             'max_tokens' => 2500,
             'timeout' => 60,
+            'model_embedding'=> env('EMBEDDING_MODEL', 'nomic-embed-text'),
+
         ],
 
         'gemini' => [
@@ -70,6 +73,8 @@ return [
             'temperature' => 0.7,
             'max_tokens' => 2500,
             'timeout' => 60,
+            'model_embedding'=> env('EMBEDDING_MODEL', 'nomic-embed-text'),
+
         ],
 
         'schooltry' => [
@@ -80,6 +85,7 @@ return [
                 'standard' => env('AI_DOCS_SCHOOLTRY_STANDARD_MODEL', 'documentation'),
                 'heavy' => env('AI_DOCS_SCHOOLTRY_HEAVY_MODEL', 'documentation'),
             ],
+            'model_embedding'=> env('EMBEDDING_MODEL', 'nomic-embed-text'),
             'temperature' => 0.7,
             'max_tokens' => 4000,
             'timeout' => 120,

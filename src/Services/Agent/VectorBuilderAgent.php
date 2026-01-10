@@ -50,13 +50,11 @@ class VectorBuilderAgent extends RAG
     {
         $provider = config('ai-docs.provider', 'schooltry');
         $providerConfig = config('ai-docs.providers')[$provider] ?? [];
-
-        // Use embedding_url if available (for schooltry provider), otherwise use base_url
-        $url = $providerConfig['embedding_url'] ?? 'http://localhost:11434';
+        $url = $providerConfig['base_url'] ?? 'http://localhost:11434';
         $model = $providerConfig['model_embedding'] ?? 'nomic-embed-text';
 
-        return new OllamaProvider(
-            url: $url . '/api/docs',
+        return new OllamaEmbedingProvider(
+            url: $url,
             model: $model,
         );
     }
@@ -66,7 +64,7 @@ class VectorBuilderAgent extends RAG
     protected function vectorStore(): VectorStoreInterface
     {
         return new FileVectorStore(
-            directory: config('ai-docs.vector_db.store_path'),
+            directory:storage_path('app/'.config('ai-docs.vector_db.store_path')),
             topK: 4
         );
     }
