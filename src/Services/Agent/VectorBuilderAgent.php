@@ -48,12 +48,15 @@ class VectorBuilderAgent extends RAG
 
     protected function embeddings(): EmbeddingsProviderInterface
     {
-        $provider = config('ai-docs.provider', 'ollama');
+        $provider = config('ai-docs.provider', 'schooltry');
         $providerConfig = config('ai-docs.providers')[$provider] ?? [];
-        $url = $providerConfig['base_url'] ?? 'http://localhost:11434';
+
+        // Use embedding_url if available (for schooltry provider), otherwise use base_url
+        $url = $providerConfig['embedding_url'] ?? 'http://localhost:11434';
         $model = $providerConfig['model_embedding'] ?? 'nomic-embed-text';
+
         return new OllamaProvider(
-            url: $url.'/api',
+            url: $url . '/api/docs',
             model: $model,
         );
     }

@@ -23,7 +23,7 @@ class BuildDocVectorDbCommand extends Command
     public function handle(): int
     {
         $dir = $this->option('dir') ?? config('ai-docs.generation.output_dir');
-        $dir = base_path($dir);
+        $dir = storage_path('app/'.$dir);
         $force = $this->option('force');
         $limit = (int) $this->option('limit');
 
@@ -68,7 +68,7 @@ class BuildDocVectorDbCommand extends Command
             $path = $file->getRealPath();
             $content = FileDataLoader::for($path)->getDocuments();
             VectorBuilderAgent::make()->addDocuments($content);
-            
+
             $content = File::get($path);
             $docIndex[] = $this->buildDocIndexEntry($path, $content);
         }
