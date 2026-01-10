@@ -78,12 +78,12 @@ return [
         ],
 
         'schooltry' => [
-            'base_url' => env('AI_DOCS_SCHOOLTRY_URL', 'http://localhost:8000/api/docs'),
-            'api_key' => env('AI_DOCS_SCHOOLTRY_KEY'), // Optional, for future authentication
+            'base_url' => env('AI_SERVICE_URL', 'http://localhost:8000/api/docs'),
+            'api_key' => env('AI_SERVICE_API_KEY'), // Optional, for future authentication
             'models' => [
-                'lightweight' => env('AI_DOCS_SCHOOLTRY_LIGHT_MODEL', 'documentation'),
-                'standard' => env('AI_DOCS_SCHOOLTRY_STANDARD_MODEL', 'documentation'),
-                'heavy' => env('AI_DOCS_SCHOOLTRY_HEAVY_MODEL', 'documentation'),
+                'lightweight' => env('AI_SERVICE_LIGHT_MODEL', 'documentation'),
+                'standard' => env('AI_SERVICE_STANDARD_MODEL', 'documentation'),
+                'heavy' => env('AI_SERVICE_HEAVY_MODEL', 'documentation'),
             ],
             'model_embedding'=> env('EMBEDDING_MODEL', 'nomic-embed-text'),
             'temperature' => 0.7,
@@ -177,12 +177,12 @@ return [
     |
     */
     'ai_service' => [
-        'enabled' => env('AI_DOCS_UPLOAD_ENABLED', false),
+        'enabled' => env('AI_SERVICE_UPLOAD_ENABLED', true),
         'url' => env('AI_SERVICE_URL', 'http://localhost:8000'),
         'api_key' => env('AI_SERVICE_API_KEY', ''),
-        'agent' => env('AI_DOCS_AGENT_NAME', 'documentation'),
-        'timeout' => env('AI_DOCS_UPLOAD_TIMEOUT', 60),
-        'verify_ssl' => env('AI_DOCS_VERIFY_SSL', true),
+        'agent' => env('AI_SERVICE_AGENT_NAME', 'documentation'),
+        'timeout' => env('AI_SERVICE_UPLOAD_TIMEOUT', 60),
+        'verify_ssl' => env('AI_SERVICE_VERIFY_SSL', true),
     ],
 ];
 

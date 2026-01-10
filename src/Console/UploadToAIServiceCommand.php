@@ -42,9 +42,6 @@ class UploadToAIServiceCommand extends Command
                 $this->line("   - {$error}");
             }
             $this->newLine();
-            $this->line('Required environment variables:');
-            $this->line('   - AI_SERVICE_URL (e.g., http://localhost:8000)');
-            $this->line('   - AI_SERVICE_API_KEY (your API key)');
             return Command::FAILURE;
         }
 
