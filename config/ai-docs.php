@@ -177,12 +177,12 @@ return [
     |
     */
     'ai_service' => [
-        'enabled' => env('AI_SERVICE_UPLOAD_ENABLED', true),
+        'enabled' => env('AI_DOCS_UPLOAD_ENABLED', false),
         'url' => env('AI_SERVICE_URL', 'http://localhost:8000'),
         'api_key' => env('AI_SERVICE_API_KEY', ''),
-        'agent' => env('AI_SERVICE_AGENT_NAME', 'documentation'),
-        'timeout' => env('AI_SERVICE_UPLOAD_TIMEOUT', 60),
-        'verify_ssl' => env('AI_SERVICE_VERIFY_SSL', true),
+        'agent' => env('AI_SERVICE_AGENT_NAME', 'customer_support'),
+        'timeout' => env('AI_DOCS_UPLOAD_TIMEOUT', 60),
+        'verify_ssl' => env('AI_DOCS_VERIFY_SSL', true),
     ],
 ];
 

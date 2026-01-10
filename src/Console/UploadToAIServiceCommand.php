@@ -82,7 +82,13 @@ class UploadToAIServiceCommand extends Command
 
         // Perform upload
         $this->info('Uploading...');
-        $result = $uploader->upload($neuronStorePath, $indexPath);
+        try{
+
+            $result = $uploader->upload($neuronStorePath, $indexPath);
+        }catch(\Exception $e){
+            $this->error('❌ Upload failed: ' . $e->getMessage());
+            return Command::FAILURE;
+        }
 
         $this->newLine();
 
@@ -141,8 +147,8 @@ class UploadToAIServiceCommand extends Command
      */
     protected function resolveFilePaths(): array
     {
-        $neuronStorePath = storage_path(config('ai-docs.vector_db.store_path').'/neuron.store');
-        $indexPath =  storage_path(config('ai-docs.vector_db.store_path').'/index.json');
+        $neuronStorePath = storage_path('app/'.config('ai-docs.vector_db.store_path').'/neuron.store');
+        $indexPath =  storage_path('app/'.config('ai-docs.vector_db.store_path').'/index.json');
 
         // Check explicit file paths
         if ($this->option('neuron-store') && $this->option('index')) {
@@ -152,13 +158,6 @@ class UploadToAIServiceCommand extends Command
         // Check directory option
         elseif ($this->option('dir')) {
             $dir = $this->option('dir');
-            $neuronStorePath = base_path(config('ai-docs.vector_db.store_path'));
-            $indexPath = $dir . DIRECTORY_SEPARATOR . 'index.json';
-        }
-        // Use default from config
-        else {
-            $outputDir = config('ai-docs.generation.output_dir');
-            $dir = base_path($outputDir);
             $neuronStorePath = base_path(config('ai-docs.vector_db.store_path'));
             $indexPath = $dir . DIRECTORY_SEPARATOR . 'index.json';
         }
