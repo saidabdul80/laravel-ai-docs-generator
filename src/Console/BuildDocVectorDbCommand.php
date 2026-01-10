@@ -5,6 +5,8 @@ namespace SchoolTry\AIDocumentationGenerator\Console;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use NeuronAI\RAG\DataLoader\FileDataLoader;
+use SchoolTry\AIDocumentationGenerator\Services\Agent\VectorBuilderAgent;
 use SchoolTry\AIDocumentationGenerator\Services\AIServiceUploader;
 
 class BuildDocVectorDbCommand extends Command
@@ -59,13 +61,15 @@ class BuildDocVectorDbCommand extends Command
 
         $docIndex = [];
 
-        $ragInstance  = new  NeuronAI\RAG\RAG();
+
         foreach ($files as $file) {
             $progressBar->advance();
 
             $path = $file->getRealPath();
+            $content = FileDataLoader::for($path)->getDocuments();
+            VectorBuilderAgent::make()->addDocuments($content);
+            
             $content = File::get($path);
-            $ragInstance::make()->addDocuments($content);
             $docIndex[] = $this->buildDocIndexEntry($path, $content);
         }
 
