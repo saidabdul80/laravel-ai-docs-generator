@@ -10,7 +10,7 @@ return [
     | Supported: 'ollama', 'openai', 'claude', 'gemini', 'schooltry'
     |
     */
-    'provider' => env('AI_DOCS_PROVIDER', 'ollama'),
+    'provider' => env('AI_SERVICE_PROVIDER', 'ollama'),
 
     /*
     |--------------------------------------------------------------------------
@@ -78,7 +78,7 @@ return [
         ],
 
         'schooltry' => [
-            'base_url' => env('AI_SERVICE_URL', 'http://localhost:8000/api/docs'),
+            'base_url' => env('AI_SERVICE_URL', 'http://localhost:8000').'/api/docs',
             'api_key' => env('AI_SERVICE_API_KEY'), // Optional, for future authentication
             'models' => [
                 'lightweight' => env('AI_SERVICE_LIGHT_MODEL', 'documentation'),
@@ -177,7 +177,7 @@ return [
     |
     */
     'ai_service' => [
-        'enabled' => env('AI_DOCS_UPLOAD_ENABLED', false),
+        'enabled' => env('AI_SERVICE_UPLOAD_ENABLED', true),
         'url' => env('AI_SERVICE_URL', 'http://localhost:8000'),
         'api_key' => env('AI_SERVICE_API_KEY', ''),
         'agent' => env('AI_SERVICE_AGENT_NAME', 'customer_support'),

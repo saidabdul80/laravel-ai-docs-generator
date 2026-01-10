@@ -132,35 +132,77 @@ class CustomerSupportController extends Controller
     {
         $request->validate([
             'session_id' => 'required|string',
+            'limit' => 'nullable|integer|min:1|max:500',
+            'before_id' => 'nullable|integer|min:1',
         ]);
 
-        $historyModel = $this->resolveHistoryModel();
-        if (!$historyModel) {
+        $sessionId = $request->input('session_id');
+        $limit = $request->input('limit');
+        $beforeId = $request->input('before_id');
+
+        $aiServiceUrl = $this->supportConfig('ai_service.url', config('ai-docs.ai_service.url', 'http://localhost:8000'));
+        $aiServiceKey = $this->supportConfig('ai_service.api_key', config('ai-docs.ai_service.api_key'));
+
+        if (empty($aiServiceKey)) {
             return response()->json([
                 'success' => false,
-                'error' => 'Chat history model is not configured.',
-            ], 501);
+                'error' => 'AI service is not configured. Please set AI_SERVICE_API_KEY.',
+            ], 503);
         }
 
-        $user = $request->user();
-        $sessionId = $request->input('session_id');
-
         try {
-            $history = $historyModel::query()
-                ->where('session_id', $sessionId)
-                ->when($user, fn($q) => $q->where('user_id', $user->id))
-                ->orderBy('created_at', 'asc')
-                ->limit(50)
-                ->get()
-                ->map(function ($record) {
-                    $response = json_decode($record->response, true);
-                    return [
-                        'id' => $record->id,
-                        'query' => $record->query,
-                        'response' => is_array($response) ? ($response['response'] ?? $record->response) : $record->response,
-                        'timestamp' => $record->created_at->toIso8601String(),
+            $response = Http::withToken($aiServiceKey)
+                ->get("{$aiServiceUrl}/api/history", array_filter([
+                    'thread_id' => $sessionId,
+                    'limit' => $limit,
+                    'before_id' => $beforeId,
+                ], fn($value) => $value !== null && $value !== ''));
+
+            if (! $response->successful()) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'AI service request failed: ' . $response->body(),
+                ], $response->status());
+            }
+
+            $data = $response->json();
+            $messages = $data['messages'] ?? [];
+
+            $history = [];
+            $pendingUser = null;
+
+            foreach ($messages as $message) {
+                $role = $message['role'] ?? '';
+                $content = $message['content'] ?? '';
+
+                if (is_array($content) && array_key_exists('text', $content)) {
+                    $content = $content['text'];
+                } elseif (is_array($content)) {
+                    $content = json_encode($content);
+                }
+
+                $timestamp = $message['created_at'] ?? now()->toIso8601String();
+
+                if ($role === 'user') {
+                    $pendingUser = [
+                        'id' => $message['id'] ?? uniqid('history_', true),
+                        'query' => $content,
+                        'timestamp' => $timestamp,
                     ];
-                });
+                    continue;
+                }
+
+                if ($role === 'assistant') {
+                    $recordId = $message['id'] ?? ($pendingUser['id'] ?? uniqid('history_', true));
+                    $history[] = [
+                        'id' => $recordId,
+                        'query' => $pendingUser['query'] ?? '',
+                        'response' => $content,
+                        'timestamp' => $timestamp ?: ($pendingUser['timestamp'] ?? now()->toIso8601String()),
+                    ];
+                    $pendingUser = null;
+                }
+            }
 
             return response()->json([
                 'success' => true,
@@ -176,6 +218,57 @@ class CustomerSupportController extends Controller
             return response()->json([
                 'success' => false,
                 'error' => 'Failed to retrieve conversation history',
+            ], 500);
+        }
+    }
+
+    /**
+     * Search conversation history by text.
+     */
+    public function searchHistory(Request $request)
+    {
+        $request->validate([
+            'q' => 'required|string|min:2|max:200',
+            'limit' => 'nullable|integer|min:1|max:200',
+            'before_id' => 'nullable|integer|min:1',
+            'user_id' => 'nullable|integer|min:1',
+        ]);
+
+        $aiServiceUrl = $this->supportConfig('ai_service.url', config('ai-docs.ai_service.url', 'http://localhost:8000'));
+        $aiServiceKey = $this->supportConfig('ai_service.api_key', config('ai-docs.ai_service.api_key'));
+
+        if (empty($aiServiceKey)) {
+            return response()->json([
+                'success' => false,
+                'error' => 'AI service is not configured. Please set AI_SERVICE_API_KEY.',
+            ], 503);
+        }
+
+        try {
+            $response = Http::withToken($aiServiceKey)
+                ->get("{$aiServiceUrl}/api/history/search", array_filter([
+                    'q' => $request->input('q'),
+                    'limit' => $request->input('limit'),
+                    'before_id' => $request->input('before_id'),
+                    'user_id' => $request->input('user_id'),
+                ], fn($value) => $value !== null && $value !== ''));
+
+            if (! $response->successful()) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'AI service request failed: ' . $response->body(),
+                ], $response->status());
+            }
+
+            return response()->json($response->json());
+        } catch (\Exception $e) {
+            Log::error('Failed to search conversation history', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'error' => 'Failed to search conversation history',
             ], 500);
         }
     }
@@ -369,6 +462,15 @@ class CustomerSupportController extends Controller
                         'user_context' => $userContext,
                         'instructions' => $instructions,
                     ]);
+
+                if (! $response->successful()) {
+                    echo "data: " . json_encode([
+                        'type' => 'error',
+                        'message' => 'AI service request failed: ' . $response->body(),
+                    ]) . "\n\n";
+                    flush();
+                    return;
+                }
 
                 $fullResponse = '';
                 $body = $response->toPsrResponse()->getBody();

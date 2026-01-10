@@ -20,11 +20,12 @@ Route::prefix($apiPrefix)
         Route::prefix($prefix)
             ->middleware($middleware)
             ->group(function () {
-                Route::post('/query', [CustomerSupportController::class, 'query']);
-                Route::get('/history', [CustomerSupportController::class, 'history']);
-                Route::delete('/memory', [CustomerSupportController::class, 'clearMemory']);
-                Route::post('/ai-service/query', [CustomerSupportController::class, 'queryAIService']);
-            });
+        Route::post('/query', [CustomerSupportController::class, 'query']);
+        Route::get('/history', [CustomerSupportController::class, 'history']);
+        Route::get('/history/search', [CustomerSupportController::class, 'searchHistory']);
+        Route::delete('/memory', [CustomerSupportController::class, 'clearMemory']);
+        Route::post('/ai-service/query', [CustomerSupportController::class, 'queryAIService']);
+    });
     });
 
 $guestPrefix = $supportConfig['guest_prefix'] ?? 'customer-support/guest';
