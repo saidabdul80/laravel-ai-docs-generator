@@ -94,7 +94,7 @@ class CustomerSupportController extends Controller
             if ($response->successful()) {
                 $data = $response->json();
 
-                $this->storeHistory($message, $threadId, $agent, $data, $data['tokens_used'] ?? null);
+               // $this->storeHistory($message, $threadId, $agent, $data, $data['tokens_used'] ?? null);
 
                 return response()->json([
                     'success' => true,
@@ -298,7 +298,7 @@ class CustomerSupportController extends Controller
             if ($response->successful()) {
                 $data = $response->json();
 
-                $this->storeHistory($message, $threadId, $agent, $data, $data['tokens_used'] ?? null);
+//                $this->storeHistory($message, $threadId, $agent, $data, $data['tokens_used'] ?? null);
 
                 return response()->json([
                     'success' => true,
@@ -386,7 +386,7 @@ class CustomerSupportController extends Controller
                     $fullResponse .= $chunk;
                 }
 
-                $this->storeHistory($message, $threadId, $agent, $fullResponse, null);
+            //    $this->storeHistory($message, $threadId, $agent, $fullResponse, null);
             } catch (\Exception $e) {
                 Log::error('AI service streaming error', [
                     'error' => $e->getMessage(),

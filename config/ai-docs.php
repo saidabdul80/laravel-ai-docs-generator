@@ -203,7 +203,7 @@ return [
         'guest_middleware' => [],
         'guest_without_middleware' => ['auth:sanctum'],
         'agent_class' => env('AI_DOCS_SUPPORT_AGENT_CLASS'),
-        'history_model' => env('AI_DOCS_SUPPORT_HISTORY_MODEL'),
+        //'history_model' => env('AI_DOCS_SUPPORT_HISTORY_MODEL'),
         'history_enabled' => env('AI_DOCS_SUPPORT_HISTORY_ENABLED', true),
         'ai_service' => [
             'url' => env('AI_SERVICE_URL', 'http://localhost:8000'),
