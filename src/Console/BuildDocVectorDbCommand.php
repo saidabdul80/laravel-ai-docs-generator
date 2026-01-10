@@ -59,18 +59,14 @@ class BuildDocVectorDbCommand extends Command
 
         $docIndex = [];
 
+        $ragInstance  = new  NeuronAI\RAG\RAG();
         foreach ($files as $file) {
             $progressBar->advance();
 
             $path = $file->getRealPath();
             $content = File::get($path);
-
-            // Build document index entry
+            $ragInstance::make()->addDocuments($content);
             $docIndex[] = $this->buildDocIndexEntry($path, $content);
-
-            // Here you would integrate with your vector database
-            // For example, using NeuronAI or another vector DB solution
-            // This is a placeholder for the actual implementation
         }
 
         $progressBar->finish();
