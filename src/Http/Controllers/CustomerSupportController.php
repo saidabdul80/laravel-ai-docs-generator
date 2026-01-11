@@ -546,7 +546,7 @@ class CustomerSupportController extends Controller
 
     protected function supportConfig(string $key, mixed $default = null): mixed
     {
-        $config = config('ai-docs.customer_support', []);
+        $config = config('ai-docs', []);
         if ($key === '') {
             return $config;
         }
