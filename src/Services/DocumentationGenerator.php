@@ -155,7 +155,9 @@ class DocumentationGenerator
         $content = preg_replace('/\s+/', ' ', $content);
 
         // Find route objects
-        $pattern = '/\{[^{}]*(?:path\s*:\s*[\'"][^\'"]+[\'"])[^{}]*(?:component\s*:\s*[^,}]+|children\s*:\s*\[[^]]+\])[^{}]*\}/';
+        //$pattern = '/\{[^{}]*(?:path\s*:\s*[\'"][^\'"]+[\'"])[^{}]*(?:component\s*:\s*[^,}]+|children\s*:\s*\[[^]]+\])[^{}]*\}/';
+        $pattern = '/\{[^{}]*path\s*:\s*[\'"][^\'"]+[\'"][^{}]*(?:component\s*:\s*[^,}]+|children\s*:\s*\[[^]]+\]|redirect\s*:\s*[\'"][^\'"]+[\'"])[^{}]*\}/';
+
         preg_match_all($pattern, $content, $matches, PREG_SET_ORDER);
 
         foreach ($matches as $match) {
@@ -178,10 +180,13 @@ class DocumentationGenerator
                 }
 
                 // Skip redirects
-                if (str_contains($routeText, 'redirect:') && !str_contains($routeText, 'component:')) {
-                    continue;
-                }
-
+                // if (str_contains($routeText, 'redirect:') && !str_contains($routeText, 'component:')) {
+                //     continue;
+                // }
+                // $isRedirectOnly = str_contains($routeText, 'redirect:') && !str_contains($routeText, 'component:');
+                // if ($isRedirectOnly) {
+                //    continue;
+                // }
                 // Extract component
                 $component = $this->extractComponentFromRoute($routeText);
 
